@@ -1,0 +1,124 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: url("../images/grunge_wall.png");
+    font-size: 18px;
+    line-height: 34px;
+    font-family: sans-serif;
+    background-size: 100% auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    display: block;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+    font-family: sans-serif;
+    color: black;
+}
+
+h1 {
+    font-size: 2em;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    text-align: center;
+}
+
+h3 {
+    font-size: 1.33em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+p {
+    font-size: 18px;
+    text-align: center;
+}
+
+/*Spacing Divs*/
+
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -4em;
+    width: 100%;
+    max-width: 960px;
+    clear: both;
+}
+
+.push {
+    height: 105px;
+    clear: both;
+}
+
+.container {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    clear: both;
+}
+
+    /*Main content*/
+
+.sub-container{
+    border: 1px solid;
+    text-align: center;
+}
+
+#player {
+    width: 33%;
+    margin-left: 33%;
+}
+
+img {
+    height: 40px;
+    width: 40px;
+}
+
+#chat-window {
+    width: 50%;
+    height: 100px;
+    margin-left: 25%;
+    margin-right: 25%;
+    clear: right;
+    background-color: white;
+    border: 1px solid;
+    overflow: scroll;
+}
+
+#chat {
+    height: 30px;
+    width: 75%;
+}
+
+#send-message {
+    margin: 5px 25%;
+}
+
+
+   /*Footer*/
+
+footer {
+    position: fixed;
+    width: 100%;
+    padding: 5px 0;
+    border-top: 4px solid grey;
+    clear: both;
+    text-align: center;
+    background-color: black;
+    height: 3em;
+    width: 100%;
+    z-index: 3;
+    bottom: 0;
+}
+
+#copyright {
+    color: #eee;
+    text-align: center;
+    width: 100%;
+    font-size: 12px;
+    font-family: 'Georgia', Times, Times New Roman, serif;
+}
