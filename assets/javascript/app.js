@@ -19,9 +19,11 @@ $(document).on('ready', function(){
   var losses = 0;
   var ties = 0;
   var player1 = true;
-
   	//when subit name button is clicked
   $('#input-name').on('click', function(){
+  	//takes name from input field
+  	name = $('#name').val().trim();
+  	console.log(name);
   	//sets player1 data storage
   	p1.set({
   		name: name,
@@ -29,20 +31,35 @@ $(document).on('ready', function(){
   		wins: wins,
   		losses: losses,
   		ties: ties,
-  	})
-  	//sets player2 data storage
-  	p2.set({
-  		name: name,
-  		choice: choice,
-  		wins: wins,
-  		losses: losses,
-  		ties: ties,
-  	})
+  	});
+
   	//condition modifier to set player2 if player1 present
   	if(p1.name != ""){
-
+	  //sets player2 data storage
+	  p2.set({
+	  	name: name,
+	  	choice: choice,
+	  	wins: wins,
+	  	losses: losses,
+	  	ties: ties,
+	  });
   	}
-
   })
+  //when player1 name is set, return info to player screen
+  p1.on('value', function(data){
+  	console.log(data.val());
+  	console.log(data.val().name)
+  }
+  , function(errorObject){
+  	console.log('Errors handled: '+errorObject.code)
+  });
+  //when player2 name is set, return info to player screen
+  p2.on('value', function(data){
+  	console.log(data.val());
+  	console.log(data.val().name)
 
+  }
+  , function(errorObject){
+  	console.log('Errors handled: '+errorObject.code)
+  });
 })
