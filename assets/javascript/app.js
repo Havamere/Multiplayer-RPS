@@ -1,8 +1,8 @@
 //Ensures webpage is loaded before running JS
 $(document).on('ready', function(){
-	//sets url for variable for multiple storage spaces
+  //sets url for variable for multiple storage spaces
   var url = "http://intense-heat-4472.firebaseio.com/"
-  	//inital inputs are blank
+    //inital inputs are blank
   var name = "";
   var choice = "";
   var wins = 0;
@@ -12,54 +12,96 @@ $(document).on('ready', function(){
   //sets Firebase storage for game refernce
   var game = new Firebase(url);
  
+  makeButtons();
 
   //--------------------------------Start of Input-Name------------------------------------
-  	//when subit name button is clicked
+    //when subit name button is clicked
   $('#input-name').on('click', function(){
-  	//takes name from input field
-  	name = $('#name').val().trim();
-  	//verifies name capture
-  	console.log(name);
+    //takes name from input field
+    name = $('#name').val().trim();
+    //verifies name capture
+    console.log(name);
     //------------------------
-  	//function that only happens 'once' instead of every time value changes
-  	game.once('value', function(snapShot){
-  	  //sets up ability to check if a players object exists
-  	  var exists = snapShot.child('players').exists();
-  	  //sets ability to check if players ojbect has a 'second' player object
-  	  var full = snapShot.child('players').child('2').exists();
-  	  //runs assign player function to set players
-  	  assignPlayer(name, game, exists, full);
-  	});
+    //function that only happens 'once' instead of every time value changes
+    game.once('value', function(snapShot){
+      //sets up ability to check if a players object exists
+      var player1exists = snapShot.child('players').child('1').exists();
+      var player2exists = snapShot.child('players').child('2').exists();
+      
+      //runs assign player function to set players
+      assignPlayer(name, game, player1exists, player2exists);
+
+      var messageRef = game.child('message');
+      var timeRef = game.child('timeStamp');
+
+      messageRef.set({
+        message: "",
+      })
+
+      timeRef.onDisconnect().remove();
+
+      messageRef.onDisconnect().update({
+        message: name+': Disconnected',
+      });
+
+      //-------------------------------------------
+      //creates an object in firebase to store chat messages
+      $('#send').on('click', function(){
+        //captures message from user
+        message = $('#chat').val().trim();
+        //firebase data reference for messages with name of sender
+        messageRef.update({
+          message: name + ': ' +message,
+        });
+        timeRef.push({
+          time: Firebase.ServerValue.TIMESTAMP,
+        });
+      });//----------------------------------------
+
+      //-------------------------------------------------------------
+      //does live update for both players to chat box div so they can talk to each other
+      messageRef.on('value', function(snapShot) {
+        newMessage = snapShot.val().message;
+        $('#chat-window').append('<p>'+newMessage+'</p>');
+      });//-------------------------------------------------------------
+
+      timeRef.on('child_added', function(snapShot) {
+        timeStamp = snapShot.val().time;
+        newTime = moment(timeStamp).format('LT');
+        $('#chat-window').append('<p id="time">'+newTime+'</p>');
+      })
+
+    });
     //-------------------------
   });
   //------------------------------End of Input-Name---------------------------------
     
 
   //-=-=-=-=-=-=-=-=-=-=--Assign Player Function-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  function assignPlayer(name, game, exists, full){
-  	var playerNum;
+  function assignPlayer(name, game, player1exists, player2exists){
+    var playerNum;
 
     //-----------------------------------------------------------
-	  //updates cosntantly when game object in firebase has values
-	  game.on('value', function(snapShot){
-	  	//sets opponent name for either player
-	  	$('#opponent').text(snapShot.val().players[opponent].name);
-	  	//separates stats for player  
-	  	$('.player-stats').text(
-	  		'Wins: '+wins+
-	  		' Losses: '+losses+
-	  		' Ties: '+ties);
-	  	//sepates stats for opponent
-	  	$('.opponent-stats').text(
-	  		'Wins: '+snapShot.val().players[opponent].wins+
-	  		' Losses: '+snapShot.val().players[opponent].losses+
-	  		' Ties: '+snapShot.val().players[opponent].ties);
-	  });//-----------------------------------------------------------
+    //updates cosntantly when game object in firebase has values
+    game.on('value', function(snapShot){
+      //sets opponent name for either player
+      $('#opponent').text(snapShot.val().players[opponent].name);
+      //separates stats for player  
+      $('.player-stats').text(
+        'Wins: '+wins+
+        ' Losses: '+losses+
+        ' Ties: '+ties);
+      //sepates stats for opponent
+      $('.opponent-stats').text(
+        'Wins: '+snapShot.val().players[opponent].wins+
+        ' Losses: '+snapShot.val().players[opponent].losses+
+        ' Ties: '+snapShot.val().players[opponent].ties);
+    });//-----------------------------------------------------------
 
 
     //=======================Start of If Statement======================
     //condition modifier to set player2 if player1 present
-    if(exists && !full){
+    if(player1exists && !player2exists){
       //creates players object in game object
       var playersRef = game.child('players');
       //creates player2 object in players object
@@ -82,7 +124,7 @@ $(document).on('ready', function(){
 	  	player.onDisconnect().remove();
 	  }//--------------------if--------------------------------
 	  //informs anyone trying to join that game is full if 2 player are set
-	  else if (full) {
+	  else if (player1exists && player2exists) {
 	  	alert("Players are set, please try again later.");
 	  }//---------------------else/if-------------------------------
 	  //sets first player if no players are set in firebase game object
@@ -111,34 +153,12 @@ $(document).on('ready', function(){
 
     //------------------------Start gamePlay Function-------------------------
   	function gamePlay(playerNum, player, playersRef){
-  	  //sets data reference for turns
-  	  var turnRef = game.child('turn');
-  	  //sets data reference for messages
-  	  var messageRef = game.child('message');
-      //tells firebase to nullify messages
-  	  message.onDisconnect().update({
-  		  message: null,
-  	  });
   	  //sets up an or logic to flip opponent number based on who is which player in the firebase object
   	  opponent = playerNum === 1 ? 2 : 1;
+      //sets data reference for turns
+      var turnRef = game.child('turn');
 
-      //-------------------------------------------
-  	  //creates an object in firebase to store chat messages
-  	  $('#send').on('click', function(){
-  	    //captures message from user
-  		  message = $('#chat').val().trim();
-  	    //firebase data reference for messages with name of sender
-  		  messageRef.update({
-  		    message: name + ': ' +message,
-        });
-  		});//----------------------------------------
-
-      //-------------------------------------------------------------
-  	  //does live update for both players to chat box div so they can talk to each other
-  	  messageRef.on('value', function(snapShot) {
-  	  	newMessage = snapShot.val().message;
-  	  	$('#chat-box').append('<p>'+newMessage+'</p>');
-  	  });//-------------------------------------------------------------
+      turnRef.onDisconnect().remove();
 
   	  turnRef.set({
   	  	turn: 1,
@@ -157,8 +177,9 @@ $(document).on('ready', function(){
         if(playerNum == snapShot.val().turn) {
           //clears name entry form once player has logged in
           $('#input-player-name').empty();
+          $('#game-stats').empty();
           //creates the rock paper and scissor images for player to choose from
-          drawButtons();
+          makeButtons();
           
           //-----------------------.on(body) click function------------------------
           //captures player's choice
