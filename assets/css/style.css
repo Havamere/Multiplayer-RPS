@@ -66,6 +66,7 @@ p {
 .sub-container{
     border: 1px solid;
     text-align: center;
+    height: 300px;
 }
 
 #player {
@@ -76,6 +77,7 @@ p {
 img {
     height: 40px;
     width: 40px;
+    align-self: center;
 }
 
 #chat-window {
